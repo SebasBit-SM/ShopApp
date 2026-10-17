@@ -5,10 +5,40 @@
              xmlns:views="clr-namespace:ShopApp.Views"
              Title="HelpSupportDetailPage">
 
-    <VerticalStackLayout>
-        <Label 
-            Text="Cliente"
-            />
-    </VerticalStackLayout>
-    
+    <ContentPage.BindingContext>
+        <views:HelpSupportDetailData/>
+    </ContentPage.BindingContext>
+
+    <Grid ColumnDefinitions="*,*">
+        <VerticalStackLayout>
+            <Picker ItemsSource="{Binding Products}"
+                    SelectedItem="{Binding ProductoSeleccionado, Mode=TwoWay}"
+                    />
+
+            <HorizontalStackLayout VerticalOptions="Center">
+                <Stepper
+                    Minimum="1"
+                    Maximum="100"
+                    Increment="1"
+                    x:Name="cantidad"
+                    Value="{Binding Cantidad, Mode=TwoWay}"
+                    />
+                <Label
+                    VerticalOptions="Center"
+                    Margin="4"
+                    Text="{Binding Value, Source={x:Reference Name=cantidad}}"
+                    />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+
+        <VerticalStackLayout Grid.Column="1">
+            <Label Text="Nombre"/>
+            <Label/>
+            <Label Text="Descripcion"/>
+            <Label/>
+            <Label Text="Precio"/>
+            <Label/>
+        </VerticalStackLayout>
+
+    </Grid>
 </ContentPage>
