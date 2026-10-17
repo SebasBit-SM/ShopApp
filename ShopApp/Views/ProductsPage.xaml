@@ -9,7 +9,9 @@
         <handlers:ProductoBusquedaHandler
             Placeholder="Buscar Producto"
             DisplayMemberName="Nombre"
-            ShowsResults="True"/>
+            ShowsResults="True"
+            ItemTemplate="{StaticResource ProductDataTemplate}"
+            />
     </Shell.SearchHandler>
     
     <VerticalStackLayout x:Name="container">
