@@ -1,5 +1,6 @@
 using ShopApp.DataAcces;
 using System.Collections.ObjectModel;
+using System.Windows.Input;
 
 namespace ShopApp.Views;
 
@@ -21,7 +22,10 @@ public class HelpSupportDetailData : BindingUtilObjects
     {
         var database = new ShopDbContext();
         Products = new ObservableCollection<Product>(database.Products);
+        AddCommand = new MiComando();
     }
+
+    public ICommand AddCommand { get; set; }
 
     private ObservableCollection<Product> _products;
     private Product _productoSeleccionado;

@@ -9,7 +9,8 @@
         <views:HelpSupportDetailData/>
     </ContentPage.BindingContext>
 
-    <Grid ColumnDefinitions="*,*">
+    <Grid RowDefinitions="*,Auto,*">
+        <Grid ColumnDefinitions="*,*">
         <VerticalStackLayout>
             <CollectionView 
                     ItemsSource="{Binding Products}"
@@ -45,4 +46,8 @@
         </VerticalStackLayout>
 
     </Grid>
+
+        <Button Grid.Row="1" Text="Agregar"/>
+    </Grid>
+    
 </ContentPage>
