@@ -7,10 +7,6 @@
     x:Class="ShopApp.Views.HelpSupportPage"
     Title="HelpSupportPage">
 
-    <ContentPage.BindingContext>
-        <vm:HelpSupportViewModel VisitasPendientes="5"/>
-    </ContentPage.BindingContext>
-
     <Grid RowDefinitions="Auto,*">
 
         <Label
