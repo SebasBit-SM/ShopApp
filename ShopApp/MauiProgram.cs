@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using ShopApp.DataAcces;
+using ShopApp.Service;
 using ShopApp.Views;
+using ShopApp.ViewModels;
 
 namespace ShopApp
 {
@@ -16,6 +18,10 @@ namespace ShopApp
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
+
+            builder.Services.AddSingleton<INavegacionService, NavegacionService>();
+            builder.Services.AddTransient<HelpSupportViewModel>();
+            builder.Services.AddTransient<HelpSupportPage>();
 
             var dbContext = new ShopDbContext ();
             dbContext.Database.EnsureCreated();

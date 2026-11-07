@@ -4,9 +4,10 @@ namespace ShopApp.Views;
 
 public partial class HelpSupportPage : ContentPage
 {
-    public HelpSupportPage()
+    public HelpSupportPage(HelpSupportViewModel viewModel)
     {
         InitializeComponent();
+        BindingContext = viewModel;
     }
 
     private void Button_Clicked(object sender, EventArgs e)
