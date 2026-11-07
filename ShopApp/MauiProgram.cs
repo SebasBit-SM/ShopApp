@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿
+using Microsoft.Extensions.Logging;
 using ShopApp.DataAcces;
 using ShopApp.Service;
 using ShopApp.Views;
@@ -11,6 +12,7 @@ namespace ShopApp
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
+
             builder
                 .UseMauiApp<App>()
                 .ConfigureFonts(fonts =>
@@ -19,21 +21,43 @@ namespace ShopApp
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
-            builder.Services.AddSingleton<INavegacionService, NavegacionService>();
+            // Servicio de navegación
+            builder.Services.AddSingleton<
+                INavegacionService, NavegacionService>();
+
+            // HelpSupport
             builder.Services.AddTransient<HelpSupportViewModel>();
             builder.Services.AddTransient<HelpSupportPage>();
 
-            var dbContext = new ShopDbContext ();
-            dbContext.Database.EnsureCreated();
-            dbContext.Dispose();
+            // HelpSupportDetail
+            builder.Services.AddTransient<HelpSupportDetailViewModel>();
+            builder.Services.AddTransient<HelpSupportDetailPage>();
 
-            Routing.RegisterRoute(nameof(ProductDetailPage), typeof(ProductDetailPage));
-            Routing.RegisterRoute(nameof(ClientsDetailPage), typeof(ClientsDetailPage));
-            Routing.RegisterRoute(nameof(CategoriesDetailPage), typeof(CategoriesDetailPage));
-            Routing.RegisterRoute(nameof(HelpSupportDetailPage), typeof(HelpSupportDetailPage));
+            // Base de datos
+            using (var dbContext = new ShopDbContext())
+            {
+                dbContext.Database.EnsureCreated();
+            }
+
+            // Registro de rutas
+            Routing.RegisterRoute(
+                nameof(ProductDetailPage),
+                typeof(ProductDetailPage));
+
+            Routing.RegisterRoute(
+                nameof(ClientsDetailPage),
+                typeof(ClientsDetailPage));
+
+            Routing.RegisterRoute(
+                nameof(CategoriesDetailPage),
+                typeof(CategoriesDetailPage));
+
+            Routing.RegisterRoute(
+                nameof(HelpSupportDetailPage),
+                typeof(HelpSupportDetailPage));
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
 
             return builder.Build();

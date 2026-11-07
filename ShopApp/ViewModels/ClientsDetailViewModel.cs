@@ -1,39 +1,22 @@
-﻿using ShopApp.DataAcces;
+﻿
+using ShopApp.DataAcces;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System.Linq;
 
 namespace ShopApp.ViewModels;
 
-public class ClientsDetailViewModel : BindingUtilObjects
+public partial class ClientsDetailViewModel : ViewModelGlobal
 {
-    private string _nombreCliente = string.Empty;
+    // Propiedades observables
 
-    public string NombreCliente
-    {
-        get { return _nombreCliente; }
-        set
-        {
-            if (_nombreCliente != value)
-            {
-                _nombreCliente = value;
-                RaisePropertyChanged();
-            }
-        }
-    }
+    [ObservableProperty]
+    private string nombreCliente = string.Empty;
 
-    private string _direccionCliente = string.Empty;
+    [ObservableProperty]
+    private string direccionCliente = string.Empty;
 
-    public string DireccionCliente
-    {
-        get { return _direccionCliente; }
-        set
-        {
-            if (_direccionCliente != value)
-            {
-                _direccionCliente = value;
-                RaisePropertyChanged();
-            }
-        }
-    }
+
+    // Método para cargar los datos del cliente
 
     public void CargarCliente(int id)
     {

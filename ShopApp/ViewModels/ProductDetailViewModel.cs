@@ -1,66 +1,27 @@
 ﻿
+using CommunityToolkit.Mvvm.ComponentModel;
 using ShopApp.DataAcces;
 
 namespace ShopApp.ViewModels;
 
-public class ProductDetailViewModel : BindingUtilObjects
+public partial class ProductDetailViewModel : ViewModelGlobal
 {
-    private string _nombre = string.Empty;
-    private string _descripcion = string.Empty;
-    private decimal _precio;
-    private string _imagen = string.Empty;
+    // Propiedades observables
 
-    public string Nombre
-    {
-        get { return _nombre; }
-        set
-        {
-            if (_nombre != value)
-            {
-                _nombre = value;
-                RaisePropertyChanged();
-            }
-        }
-    }
+    [ObservableProperty]
+    private string nombre = string.Empty;
 
-    public string Descripcion
-    {
-        get { return _descripcion; }
-        set
-        {
-            if (_descripcion != value)
-            {
-                _descripcion = value;
-                RaisePropertyChanged();
-            }
-        }
-    }
+    [ObservableProperty]
+    private string descripcion = string.Empty;
 
-    public decimal Precio
-    {
-        get { return _precio; }
-        set
-        {
-            if (_precio != value)
-            {
-                _precio = value;
-                RaisePropertyChanged();
-            }
-        }
-    }
+    [ObservableProperty]
+    private decimal precio;
 
-    public string Imagen
-    {
-        get { return _imagen; }
-        set
-        {
-            if (_imagen != value)
-            {
-                _imagen = value;
-                RaisePropertyChanged();
-            }
-        }
-    }
+    [ObservableProperty]
+    private string imagen = string.Empty;
+
+
+    // Método para cargar la información del producto
 
     public void CargarProducto(int id)
     {

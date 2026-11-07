@@ -1,24 +1,20 @@
-﻿using ShopApp.DataAcces;
+﻿
+using ShopApp.DataAcces;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System.Linq;
 
 namespace ShopApp.ViewModels;
 
-public class CategoriesDetailViewModel : BindingUtilObjects
+public partial class CategoriesDetailViewModel
+    : ViewModelGlobal, IQueryAttributable
 {
-    private string _nombreCategoria = string.Empty;
+    // Propiedad observable
 
-    public string NombreCategoria
-    {
-        get { return _nombreCategoria; }
-        set
-        {
-            if (_nombreCategoria != value)
-            {
-                _nombreCategoria = value;
-                RaisePropertyChanged();
-            }
-        }
-    }
+    [ObservableProperty]
+    private string nombreCategoria = string.Empty;
+
+
+    // Método para cargar la categoría
 
     public void CargarCategoria(int id)
     {
@@ -34,6 +30,19 @@ public class CategoriesDetailViewModel : BindingUtilObjects
         else
         {
             NombreCategoria = "Categoría no encontrada";
+        }
+    }
+
+
+    // Captura de parámetros de navegación
+
+    public void ApplyQueryAttributes(
+        IDictionary<string, object> query)
+    {
+        if (query.TryGetValue("id", out var valorId)
+            && int.TryParse(valorId?.ToString(), out int id))
+        {
+            CargarCategoria(id);
         }
     }
 }

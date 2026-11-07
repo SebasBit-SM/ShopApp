@@ -1,24 +1,27 @@
+
 using ShopApp.ViewModels;
 
 namespace ShopApp.Views;
 
-public partial class HelpSupportDetailPage : ContentPage, IQueryAttributable
+public partial class HelpSupportDetailPage
+    : ContentPage, IQueryAttributable
 {
-    public HelpSupportDetailPage()
+    private readonly HelpSupportDetailViewModel _viewModel;
+
+    public HelpSupportDetailPage(
+        HelpSupportDetailViewModel viewModel)
     {
         InitializeComponent();
+
+        _viewModel = viewModel;
+        BindingContext = _viewModel;
     }
 
     public void ApplyQueryAttributes(
         IDictionary<string, object> query)
     {
-        Title = $"Cliente: {query["id"]}";
+        _viewModel.ApplyQueryAttributes(query);
 
-        var clientId = int.Parse(query["id"].ToString());
-
-        if (BindingContext is HelpSupportDetailViewModel viewModel)
-        {
-            viewModel.ClienteId = clientId;
-        }
+        Title = $"Cliente: {_viewModel.ClienteId}";
     }
 }

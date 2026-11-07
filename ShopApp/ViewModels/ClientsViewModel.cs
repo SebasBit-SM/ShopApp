@@ -5,7 +5,7 @@ using System.Windows.Input;
 
 namespace ShopApp.ViewModels;
 
-public class ClientsViewModel : BindingUtilObjects
+public class ClientsViewModel : ViewModelGlobal
 {
     public ClientsViewModel()
     {

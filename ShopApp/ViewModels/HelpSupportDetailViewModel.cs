@@ -1,19 +1,47 @@
-﻿using ShopApp.DataAcces;
+﻿
+using ShopApp.DataAcces;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 namespace ShopApp.ViewModels;
 
-public class HelpSupportDetailViewModel : BindingUtilObjects
+public partial class HelpSupportDetailViewModel
+    : ViewModelGlobal, IQueryAttributable
 {
+    // Propiedades observables
+
+    [ObservableProperty]
+    private ObservableCollection<Compra> compras = new();
+
+    [ObservableProperty]
+    private int clienteId;
+
+    [ObservableProperty]
+    private ObservableCollection<Product> products = new();
+
+    [ObservableProperty]
+    private Product? productoSeleccionado;
+
+    [ObservableProperty]
+    private int cantidad = 1;
+
+
+    // Constructor
+
     public HelpSupportDetailViewModel()
     {
-        var database = new ShopDbContext();
+        using var database = new ShopDbContext();
 
-        Products = new ObservableCollection<Product>(database.Products);
+        Products = new ObservableCollection<Product>(
+            database.Products.ToList()
+        );
 
         AddCommand = new MiComando(() =>
         {
+            if (ProductoSeleccionado == null)
+                return;
+
             var compra = new Compra(
                 ClienteId,
                 ProductoSeleccionado.Id,
@@ -25,74 +53,21 @@ public class HelpSupportDetailViewModel : BindingUtilObjects
         () => true);
     }
 
-    public ICommand AddCommand { get; set; }
 
-    private ObservableCollection<Compra> _compras =
-        new ObservableCollection<Compra>();
+    // Comando para agregar compras
 
-    public ObservableCollection<Compra> Compras
+    public ICommand AddCommand { get; }
+
+
+    // Captura de parámetros de navegación
+
+    public void ApplyQueryAttributes(
+        IDictionary<string, object> query)
     {
-        get { return _compras; }
-        set
+        if (query.TryGetValue("id", out var valorId)
+            && int.TryParse(valorId?.ToString(), out int id))
         {
-            if (_compras != value)
-            {
-                _compras = value;
-                RaisePropertyChanged();
-            }
-        }
-    }
-
-    private int _clienteId;
-
-    public int ClienteId
-    {
-        get { return _clienteId; }
-        set { _clienteId = value; }
-    }
-
-    private ObservableCollection<Product> _products;
-
-    public ObservableCollection<Product> Products
-    {
-        get { return _products; }
-        set
-        {
-            if (_products != value)
-            {
-                _products = value;
-                RaisePropertyChanged();
-            }
-        }
-    }
-
-    private Product _productoSeleccionado;
-
-    public Product ProductoSeleccionado
-    {
-        get { return _productoSeleccionado; }
-        set
-        {
-            if (_productoSeleccionado != value)
-            {
-                _productoSeleccionado = value;
-                RaisePropertyChanged();
-            }
-        }
-    }
-
-    private int _cantidad = 1;
-
-    public int Cantidad
-    {
-        get { return _cantidad; }
-        set
-        {
-            if (_cantidad != value)
-            {
-                _cantidad = value;
-                RaisePropertyChanged();
-            }
+            ClienteId = id;
         }
     }
 }
