@@ -42,6 +42,10 @@ namespace ShopApp
             // Nuevo DbContext de SQLite
             builder.Services.AddDbContext<ShopOutDbContext>();
 
+            builder.Services.AddTransient<ResumenViewModel>();
+
+            builder.Services.AddTransient<ResumenPage>();
+
             // Base de datos existente
             using (var dbContext = new ShopDbContext())
             {
@@ -64,6 +68,10 @@ namespace ShopApp
             Routing.RegisterRoute(
                 nameof(HelpSupportDetailPage),
                 typeof(HelpSupportDetailPage));
+
+            Routing.RegisterRoute(
+                nameof(ResumenPage),
+                typeof(ResumenPage));
 
 #if DEBUG
             builder.Logging.AddDebug();

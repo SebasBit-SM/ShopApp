@@ -3,6 +3,7 @@ using ShopApp.DataAcces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using Microsoft.EntityFrameworkCore;
 
 namespace ShopApp.ViewModels;
 
@@ -27,10 +28,18 @@ public partial class HelpSupportDetailViewModel
     private int cantidad = 1;
 
 
+    // Base de datos SQLite
+
+    private readonly ShopOutDbContext _outDbContext;
+
+
     // Constructor
 
-    public HelpSupportDetailViewModel()
+    public HelpSupportDetailViewModel(
+        ShopOutDbContext outDbContext)
     {
+        _outDbContext = outDbContext;
+
         using var database = new ShopDbContext();
 
         Products = new ObservableCollection<Product>(
@@ -51,12 +60,66 @@ public partial class HelpSupportDetailViewModel
             Compras.Add(compra);
         },
         () => true);
+
+        EnviarCompraCommand = new MiComando(async () =>
+        {
+            await EnviarCompra();
+        },
+        () => true);
     }
 
 
-    // Comando para agregar compras
+    // Comandos
 
     public ICommand AddCommand { get; }
+
+    public ICommand EnviarCompraCommand { get; }
+
+
+    // Guardar compras en SQLite
+
+
+    private async Task EnviarCompra()
+    {
+        if (Compras.Count == 0)
+        {
+            await Shell.Current.DisplayAlert(
+                "Aviso",
+                "No hay productos para guardar.",
+                "OK");
+
+            return;
+        }
+
+        foreach (var item in Compras)
+        {
+            // Buscar el producto para obtener su precio
+            var producto = Products.FirstOrDefault(
+                p => p.Id == item.ProductId);
+
+            if (producto == null)
+                continue;
+
+            // Crear el registro que se guardará en SQLite
+            var compraItem = new CompraItem(
+                item.ClienteId,
+                item.ProductId,
+                item.Cantidad,
+                producto.Precio
+            );
+
+            _outDbContext.Compras.Add(compraItem);
+        }
+
+        // Guardar los cambios en SQLite
+        await _outDbContext.SaveChangesAsync();
+
+        await Shell.Current.DisplayAlert(
+            "Éxito",
+            "Compra guardada localmente en SQLite.",
+            "OK");
+    }
+
 
 
     // Captura de parámetros de navegación

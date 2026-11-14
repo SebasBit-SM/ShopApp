@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
+
 <ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:vm="clr-namespace:ShopApp.ViewModels"
     x:Class="ShopApp.Views.HelpSupportDetailPage"
     Title="HelpSupportDetailPage">
 
-    <ContentPage.BindingContext>
-        <vm:HelpSupportDetailViewModel/>
-    </ContentPage.BindingContext>
-
-    <Grid RowDefinitions="*,Auto,*">
+    <Grid RowDefinitions="*,Auto,*,Auto">
 
         <Grid ColumnDefinitions="*,*">
 
@@ -64,6 +60,11 @@
         <CollectionView
             Grid.Row="2"
             ItemsSource="{Binding Compras}"/>
+
+        <Button
+            Grid.Row="3"
+            Text="Finalizar Compra"
+            Command="{Binding EnviarCompraCommand}"/>
 
     </Grid>
 

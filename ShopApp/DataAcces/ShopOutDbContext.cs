@@ -18,7 +18,7 @@ public class ShopOutDbContext : DbContext
         DbContextOptionsBuilder optionsBuilder)
     {
         var conexionString =
-            $"FileName={_databaseRuta.get("shopdatabase.db")}";
+            $"Data Source={_databaseRuta.get("shopdatabase.db")}";
 
         optionsBuilder.UseSqlite(conexionString);
     }
