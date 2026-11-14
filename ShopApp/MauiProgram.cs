@@ -1,7 +1,9 @@
 ﻿
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 using ShopApp.DataAcces;
 using ShopApp.Service;
+using ShopApp.Services;
 using ShopApp.Views;
 using ShopApp.ViewModels;
 
@@ -33,7 +35,14 @@ namespace ShopApp
             builder.Services.AddTransient<HelpSupportDetailViewModel>();
             builder.Services.AddTransient<HelpSupportDetailPage>();
 
-            // Base de datos
+            // Servicio de ruta para SQLite
+            builder.Services.AddSingleton<
+                IDatabaseRutaService, DatabaseRutaService>();
+
+            // Nuevo DbContext de SQLite
+            builder.Services.AddDbContext<ShopOutDbContext>();
+
+            // Base de datos existente
             using (var dbContext = new ShopDbContext())
             {
                 dbContext.Database.EnsureCreated();
@@ -60,7 +69,19 @@ namespace ShopApp
             builder.Logging.AddDebug();
 #endif
 
-            return builder.Build();
+            // Construir la aplicación
+            var app = builder.Build();
+
+            // Crear la base de datos SQLite
+            using (var scope = app.Services.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider
+                    .GetRequiredService<ShopOutDbContext>();
+
+                dbContext.Database.EnsureCreated();
+            }
+
+            return app;
         }
     }
 }
