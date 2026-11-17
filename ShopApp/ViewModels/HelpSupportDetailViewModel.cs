@@ -1,9 +1,9 @@
 ﻿
-using ShopApp.DataAcces;
 using CommunityToolkit.Mvvm.ComponentModel;
+using ShopApp.DataAcces;
+using ShopApp.Services;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using Microsoft.EntityFrameworkCore;
 
 namespace ShopApp.ViewModels;
 
@@ -33,18 +33,35 @@ public partial class HelpSupportDetailViewModel
     private readonly ShopOutDbContext _outDbContext;
 
 
+    // Servicio de conectividad
+
+    private readonly IConnectivity _connectivity;
+
+
+    // Servicio del Backend
+
+    private readonly CompraService _compraService;
+
+
     // Constructor
 
     public HelpSupportDetailViewModel(
-        ShopOutDbContext outDbContext)
+        ShopOutDbContext outDbContext,
+        IConnectivity connectivity,
+        CompraService compraService)
     {
         _outDbContext = outDbContext;
+        _connectivity = connectivity;
+        _compraService = compraService;
 
         using var database = new ShopDbContext();
 
         Products = new ObservableCollection<Product>(
             database.Products.ToList()
         );
+
+
+        // Comando para agregar productos
 
         AddCommand = new MiComando(() =>
         {
@@ -61,11 +78,20 @@ public partial class HelpSupportDetailViewModel
         },
         () => true);
 
+
+        // Comando para finalizar compra
+
         EnviarCompraCommand = new MiComando(async () =>
         {
             await EnviarCompra();
         },
-        () => true);
+        () => StatusConnection());
+
+
+        // Detectar cambios de conectividad
+
+        _connectivity.ConnectivityChanged +=
+            Connectivity_ConnectivityChanged;
     }
 
 
@@ -76,8 +102,30 @@ public partial class HelpSupportDetailViewModel
     public ICommand EnviarCompraCommand { get; }
 
 
-    // Guardar compras en SQLite
+    // Evento de conectividad
 
+    private void Connectivity_ConnectivityChanged(
+        object? sender,
+        ConnectivityChangedEventArgs e)
+    {
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            ((MiComando)EnviarCompraCommand)
+                .RaiseCanExecuteChanged();
+        });
+    }
+
+
+    // Verificar conexión a Internet
+
+    private bool StatusConnection()
+    {
+        return _connectivity.NetworkAccess
+            == NetworkAccess.Internet ? true : false;
+    }
+
+
+    // Enviar compras al Backend y guardar en SQLite
 
     private async Task EnviarCompra()
     {
@@ -85,22 +133,24 @@ public partial class HelpSupportDetailViewModel
         {
             await Shell.Current.DisplayAlert(
                 "Aviso",
-                "No hay productos para guardar.",
+                "No hay productos para enviar.",
                 "OK");
 
             return;
         }
 
+        // Preparar los datos de las compras
+
+        var comprasParaEnviar = new List<CompraItem>();
+
         foreach (var item in Compras)
         {
-            // Buscar el producto para obtener su precio
             var producto = Products.FirstOrDefault(
                 p => p.Id == item.ProductId);
 
             if (producto == null)
                 continue;
 
-            // Crear el registro que se guardará en SQLite
             var compraItem = new CompraItem(
                 item.ClienteId,
                 item.ProductId,
@@ -108,18 +158,56 @@ public partial class HelpSupportDetailViewModel
                 producto.Precio
             );
 
-            _outDbContext.Compras.Add(compraItem);
+            comprasParaEnviar.Add(compraItem);
         }
 
-        // Guardar los cambios en SQLite
-        await _outDbContext.SaveChangesAsync();
+        if (comprasParaEnviar.Count != Compras.Count)
+        {
+            await Shell.Current.DisplayAlert(
+                "Error",
+                "No se encontraron todos los productos de la compra.",
+                "OK");
 
-        await Shell.Current.DisplayAlert(
-            "Éxito",
-            "Compra guardada localmente en SQLite.",
-            "OK");
+            return;
+        }
+
+        // Enviar las compras al Backend
+
+        try
+        {
+            var resultado = await _compraService
+                .EnviarData(comprasParaEnviar);
+
+            if (resultado)
+            {
+                // Guardar también en SQLite local
+
+                _outDbContext.Compras.AddRange(
+                    comprasParaEnviar);
+
+                await _outDbContext.SaveChangesAsync();
+
+                await Shell.Current.DisplayAlert(
+                    "Éxito",
+                    "Compra enviada correctamente al servidor backend y guardada en SQLite.",
+                    "OK");
+            }
+            else
+            {
+                await Shell.Current.DisplayAlert(
+                    "Error",
+                    "El servidor rechazó la compra o devolvió un error.",
+                    "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert(
+                "Error",
+                $"Ocurrió una excepción al procesar la compra: {ex.Message}",
+                "OK");
+        }
     }
-
 
 
     // Captura de parámetros de navegación

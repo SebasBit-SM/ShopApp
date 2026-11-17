@@ -46,6 +46,13 @@ namespace ShopApp
 
             builder.Services.AddTransient<ResumenPage>();
 
+            builder.Services.AddSingleton(Connectivity.Current);
+
+            builder.Services.AddSingleton<CompraService>();
+            builder.Services.AddSingleton<HttpClient>();
+
+
+
             // Base de datos existente
             using (var dbContext = new ShopDbContext())
             {
